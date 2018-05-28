@@ -1,4 +1,4 @@
-Imports System
+Imports System.Random
 
 Module Program
 

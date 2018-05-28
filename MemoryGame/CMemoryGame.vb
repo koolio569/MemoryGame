@@ -1,6 +1,6 @@
 ﻿Public Class CMemoryGame
 
-    Private _difficulty As Integer
+    Private ReadOnly _difficulty As Integer
 
     Private _possibleWords As List(Of String)
 
@@ -14,6 +14,8 @@
 
         _difficulty = difficulty
 
+        _possibleWords = New List(Of String)
+
         Dim wordlist_file As New System.IO.StreamReader(filePath, True)
 
         While Not wordlist_file.EndOfStream
@@ -24,7 +26,9 @@
 
         wordlist_file.Close()
 
-        _possibleWords = _possibleWords.OrderBy(Function() Rnd()).ToList
+        _possibleWords = _possibleWords.OrderBy(Function() New Random().NextDouble()).ToList
+
+        _grid = New List(Of String)
 
         For i = 0 To (_difficulty ^ 2) - 1
 
@@ -42,13 +46,14 @@
 
         Draw()
 
-        Console.WriteLine("What word was added?")
-        CheckAnswer(_added)
+        CheckAnswer(_added, "What word was added?")
 
-        Console.WriteLine("What word was removed?")
-        CheckAnswer(_removed)
+        CheckAnswer(_removed, "What word was removed?")
+
+        Console.Clear()
 
         Console.WriteLine("winner!!!")
+
         Console.ReadKey()
 
     End Sub
@@ -61,19 +66,21 @@
 
             If i Mod _difficulty = 0 Then
 
-                Console.WriteLine()
+                Console.Write(_grid(i - 1) & " ")
 
-                Console.Write(_grid(i - 1))
+                Console.WriteLine()
 
             Else
 
-                Console.Write(_grid(i - 1))
+                Console.Write(_grid(i - 1) & " ")
 
             End If
 
         Next
 
-        Threading.Thread.Sleep(30000)
+        'Threading.Thread.Sleep(30000)
+
+        Console.ReadKey()
 
     End Sub
 
@@ -81,13 +88,13 @@
 
         Dim RandomInt As Integer
 
-        RandomInt = Math.Floor(Rnd() * (_grid.Count - 1))
+        RandomInt = Math.Floor(New Random().NextDouble * (_grid.Count - 1))
 
         _removed = _grid(RandomInt)
 
         _grid.RemoveAt(RandomInt)
 
-        RandomInt = Math.Floor(Rnd() * (_possibleWords.Count - 1))
+        RandomInt = Math.Floor(New Random().NextDouble() * (_possibleWords.Count - 1))
 
         _added = _possibleWords(RandomInt)
 
@@ -95,13 +102,15 @@
 
     End Sub
 
-    Sub CheckAnswer(ByVal answer As String)
+    Sub CheckAnswer(ByVal answer As String, ByVal title As String)
 
         Dim input As String = ""
 
         Do Until input = answer
 
             Console.Clear()
+
+            Console.WriteLine(title)
 
             Console.WriteLine("Input answer")
 
